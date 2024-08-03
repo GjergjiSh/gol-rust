@@ -16,10 +16,6 @@ impl Cell {
         Cell(0)
     }
 
-    pub fn flip_bit(&mut self, idx: u8) {
-        self.0 ^= 1 << idx;
-    }
-
     pub fn spawn(&mut self) {
         self.0 |= 1;
     }
@@ -42,6 +38,10 @@ impl Cell {
 
     pub fn is_alive(&self) -> bool {
         self.0 & 1 == 1
+    }
+
+    pub fn clear(&mut self) {
+        self.0 = 0;
     }
 }
 
@@ -78,6 +78,14 @@ impl<const H: usize, const W: usize> Field<H, W> {
         assert_eq!(y < H, true);
         &mut self.cells[y][x]
     }
+
+    pub fn reset(&mut self) {
+        for i in 0..H {
+            for j in 0..W {
+                self.cells[i][j].clear();
+            }
+        }
+    }
 }
 
 // Debug/Visualization
@@ -96,5 +104,141 @@ impl<const H: usize, const W: usize> fmt::Display for Field<H, W> {
 impl fmt::Display for Cell {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{:08b}", self.0)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn setup() -> Field<2, 5> {
+        Field::<2, 5>::new()
+    }
+
+    #[test]
+    fn test_spawn() {
+        let mut field = setup();
+        let cell = field.mut_cell(0, 0);
+        cell.spawn();
+        assert_eq!(cell.is_alive(), true);
+        assert_eq!(cell.to_string(), "00000001");
+        assert_eq!(*cell == 0b00000001, true);
+    }
+
+    #[test]
+    fn test_kill() {
+        let mut field = setup();
+        let cell = field.mut_cell(0, 0);
+        cell.spawn();
+        cell.kill();
+        assert_eq!(cell.is_alive(), false);
+        assert_eq!(cell.to_string(), "00000000");
+        assert_eq!(*cell == 0b00000000, true);
+    }
+
+    #[test]
+    fn test_set_neighbors_0() {
+        let mut field = setup();
+        let cell = field.mut_cell(0, 0);
+        cell.set_neighbors(0);
+        assert_eq!(cell.neighbour_cnt(), 0);
+        assert_eq!(cell.to_string(), "00000000");
+        assert_eq!(*cell == 0b00000000, true);
+    }
+
+    #[test]
+    fn test_set_neighbors_1() {
+        let mut field = setup();
+        let cell = field.mut_cell(0, 0);
+        cell.set_neighbors(1);
+        assert_eq!(cell.neighbour_cnt(), 1);
+        assert_eq!(cell.to_string(), "00000010");
+        assert_eq!(*cell == 0b00000010, true);
+    }
+
+    #[test]
+    fn test_set_neighbors_2() {
+        let mut field = setup();
+        let cell = field.mut_cell(0, 0);
+        cell.set_neighbors(2);
+        assert_eq!(cell.neighbour_cnt(), 2);
+        assert_eq!(cell.to_string(), "00000100");
+        assert_eq!(*cell == 0b00000100, true);
+    }
+
+    #[test]
+    fn test_set_neighbors_3() {
+        let mut field = setup();
+        let cell = field.mut_cell(0, 0);
+        cell.set_neighbors(3);
+        assert_eq!(cell.neighbour_cnt(), 3);
+        assert_eq!(cell.to_string(), "00000110");
+        assert_eq!(*cell == 0b00000110, true);
+    }
+
+    #[test]
+    fn test_set_neighbors_4() {
+        let mut field = setup();
+        let cell = field.mut_cell(0, 0);
+        cell.set_neighbors(4);
+        assert_eq!(cell.neighbour_cnt(), 4);
+        assert_eq!(cell.to_string(), "00001000");
+        assert_eq!(*cell == 0b00001000, true);
+    }
+
+    #[test]
+    fn test_set_neighbors_5() {
+        let mut field = setup();
+        let cell = field.mut_cell(0, 0);
+        cell.set_neighbors(5);
+        assert_eq!(cell.neighbour_cnt(), 5);
+        assert_eq!(cell.to_string(), "00001010");
+        assert_eq!(*cell == 0b00001010, true);
+    }
+
+    #[test]
+    fn test_set_neighbors_6() {
+        let mut field = setup();
+        let cell = field.mut_cell(0, 0);
+        cell.set_neighbors(6);
+        assert_eq!(cell.neighbour_cnt(), 6);
+        assert_eq!(cell.to_string(), "00001100");
+        assert_eq!(*cell == 0b00001100, true);
+    }
+
+    #[test]
+    fn test_set_neighbors_7() {
+        let mut field = setup();
+        let cell = field.mut_cell(0, 0);
+        cell.set_neighbors(7);
+        assert_eq!(cell.neighbour_cnt(), 7);
+        assert_eq!(cell.to_string(), "00001110");
+        assert_eq!(*cell == 0b00001110, true);
+    }
+
+    #[test]
+    fn test_set_neighbors_8() {
+        let mut field = setup();
+        let cell = field.mut_cell(0, 0);
+        cell.set_neighbors(8);
+        assert_eq!(cell.neighbour_cnt(), 8);
+        assert_eq!(cell.to_string(), "00010000");
+        assert_eq!(*cell == 0b00010000, true);
+    }
+
+    #[test]
+    fn test_reset() {
+        let mut field = setup();
+        let cell = field.mut_cell(0, 0);
+        cell.spawn();
+        cell.set_neighbors(8);
+        assert_eq!(cell.is_alive(), true);
+        assert_eq!(cell.neighbour_cnt(), 8);
+        assert_eq!(cell.to_string(), "00010001");
+        field.reset();
+        let cell = field.cell(0, 0);
+        assert_eq!(cell.neighbour_cnt(), 0);
+        assert_eq!(cell.to_string(), "00000000");
+        assert_eq!(*cell == 0b00000000, true);
     }
 }
