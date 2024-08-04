@@ -114,6 +114,8 @@ impl<const H: usize, const W: usize> CellArray<H, W> {
             }
             println!();
         }
+
+        println!();
     }
 }
 
@@ -170,9 +172,8 @@ mod test_cell_array {
     fn test_wrapping_bottom_left_to_bottom_right() {
         let mut cell_array = setup();
 
-        // Should wrap to (ARRAY_W - 1, ARRAY_H - 1) which is the bottom-right cell
-        let x = -1; // One left of the bottom-left cell
-        let y = (ARRAY_H - 1) as isize; // Bottom row
+        let x = -1;
+        let y = (ARRAY_H - 1) as isize;
         let cell = cell_array.mut_cell(x, y);
         cell.spawn();
 
@@ -184,9 +185,8 @@ mod test_cell_array {
     fn test_wrapping_bottom_right_to_bottom_left() {
         let mut cell_array = setup();
 
-        // Should wrap to (0, ARRAY_H - 1) which is the bottom-left cell
-        let x = ARRAY_W as isize; // One right of the bottom-right cell
-        let y = (ARRAY_H - 1) as isize; // Bottom row
+        let x = ARRAY_W as isize;
+        let y = (ARRAY_H - 1) as isize;
         let cell = cell_array.mut_cell(x, y);
         cell.spawn();
 

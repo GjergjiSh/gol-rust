@@ -10,7 +10,6 @@ pub fn spawn_glider<const H: usize, const W: usize>(cell_array: &mut CellArray<H
     ];
 
     for &(x, y) in &pattern_coords {
-        let cell = cell_array.mut_cell(x, y);
-        cell.spawn();
+        cell_array.spawn_cell(x, y)
     }
 }
