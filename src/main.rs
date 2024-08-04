@@ -1,10 +1,11 @@
 //TODO: Remove
 #![allow(warnings)]
 
-mod cell;
+mod gol;
+use gol::cell_array::CellArray;
+use gol::cell::Cell;
 
-use cell::CellArray;
-use minifb::{Key, Window, WindowOptions};
+// use minifb::{Key, Window, WindowOptions};
 
 const ARRAY_H: usize = 10;
 const ARRAY_W: usize = 10;
