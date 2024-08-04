@@ -5,8 +5,6 @@ mod gol;
 use gol::cell_array::CellArray;
 use gol::cell::Cell;
 
-// use minifb::{Key, Window, WindowOptions};
-
 const ARRAY_H: usize = 10;
 const ARRAY_W: usize = 10;
 const SCALE: usize = 10;
@@ -69,7 +67,7 @@ fn count_neighbours(cell_array: &CellArray<ARRAY_H, ARRAY_W>, x: isize, y: isize
     ];
 
     for neighbor in neighbors.iter() {
-        if neighbor.is_alive() {
+        if neighbor.alive() {
             neighbour_count += 1;
         }
     }
@@ -89,7 +87,7 @@ fn solve(
     for x in 0..rows - 1 {
         for y in 0..cols - 1 {
             let cell = cell_array_copy.mut_cell(x as isize, y as isize);
-            let is_alive = cell.is_alive();
+            let is_alive = cell.alive();
             let neighbour_count = cell.neighbour_cnt();
             if VERBOSE {
                 println!(
@@ -97,7 +95,6 @@ fn solve(
                     x, y, neighbour_count, if is_alive { "alive" } else { "dead" }
                 );
             }
-            
 
             if is_alive {
                 if neighbour_count < 2 || neighbour_count > 3 {
@@ -122,7 +119,7 @@ fn render_field(cell_array: &CellArray<ARRAY_H, ARRAY_W>, buffer: &mut Vec<u32>)
     for y in 0..ARRAY_H {
         for x in 0..ARRAY_W {
             let cell = cell_array.cell(x as isize, y as isize);
-            let color = if cell.is_alive() { 0x000000 } else { 0xFFFFFF };
+            let color = if cell.alive() { 0x000000 } else { 0xFFFFFF };
             for dy in 0..SCALE {
                 for dx in 0..SCALE {
                     buffer[(y * SCALE + dy) * ARRAY_W * SCALE + (x * SCALE + dx)] = color;
@@ -149,7 +146,7 @@ fn render_field_console(cell_array: &CellArray<ARRAY_H, ARRAY_W>) {
         print!("{:2}|", y); // Row index
         for x in 0..ARRAY_W {
             let cell = cell_array.cell(x as isize, y as isize);
-            let symbol = if cell.is_alive() { '*' } else { ' ' };
+            let symbol = if cell.alive() { '*' } else { ' ' };
             print!(" {} |", symbol);
         }
         println!(); // End of the row with a side border
@@ -171,13 +168,7 @@ fn main() {
         for y in 0..cell_array.height() - 1 {
             let neighbour_count = count_neighbours(&cell_array, x as isize, y as isize);
             let cell = cell_array.mut_cell(x as isize, y as isize);
-            cell.set_neighbors(neighbour_count);
-           /*  if cell.is_alive() {
-                println!(
-                    "Cell at ({}, {}) has {} neighbours and is alive",
-                    x, y, neighbour_count
-                );
-            } */
+            // cell.set_neighbors(neighbour_count);
         }
     }
 
@@ -220,22 +211,4 @@ fn main() {
         println!();
         // println!("{}", cell_array);
     }
-
-    // let mut window = Window::new(
-    //     "Game of Life",
-    //     ARRAY_W * SCALE,
-    //     ARRAY_H * SCALE,
-    //     WindowOptions::default(),
-    // )
-    // .unwrap_or_else(|e| {
-    //     panic!("{}", e);
-    // });
-
-    // let mut buffer: Vec<u32> = vec![0; ARRAY_W * ARRAY_H * SCALE * SCALE];
-
-    // while window.is_open() && !window.is_key_down(Key::Escape) {
-    //     solve(&mut cell_array);
-    //     render_field(&cell_array, &mut buffer);
-    //     window.update_with_buffer(&buffer, ARRAY_W * SCALE, ARRAY_H * SCALE).unwrap();
-    // }
 }
