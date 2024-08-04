@@ -84,6 +84,37 @@ impl<const H: usize, const W: usize> CellArray<H, W> {
             ptr::copy_nonoverlapping(self.0.as_ptr(), other.0.as_mut_ptr(), H * W);
         }
     }
+
+    pub fn print(&self) {
+        // Print the top border with column indices
+        print!("   "); // Space for row indices
+        println!();
+
+        // Print the top border of the grid with column numbers
+        print!("  +");
+        for x in 0..W {
+            print!("-{}-+", x); // Col index
+        }
+        println!();
+
+        // Print the field with side borders and row indices
+        for y in 0..H {
+            print!("{:2}|", y); // Row index
+            for x in 0..W {
+                let cell = self.cell(x as isize, y as isize);
+                let symbol = if cell.alive() { '*' } else { ' ' };
+                print!(" {} |", symbol);
+            }
+            println!(); // End of the row with a side border
+
+            // Print the horizontal border between rows without column numbers
+            print!("  +");
+            for _ in 0..H {
+                print!("---+");
+            }
+            println!();
+        }
+    }
 }
 
 impl<const H: usize, const W: usize> fmt::Display for CellArray<H, W> {

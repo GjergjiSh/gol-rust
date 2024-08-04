@@ -4,6 +4,7 @@
 mod gol;
 use gol::cell_array::CellArray;
 use gol::cell::Cell;
+use gol::utils::spawn_glider;
 
 const ARRAY_H: usize = 10;
 const ARRAY_W: usize = 10;
@@ -17,40 +18,7 @@ const VERBOSE: bool = false;
     Reproduction: A dead cell with exactly 3 live neighbors becomes a live cell.
 */
 
-fn spawn_glider(
-    cell_array: &mut CellArray<ARRAY_H, ARRAY_W>,
-    top_left_x: isize,
-    top_left_y: isize,
-) {
-    let glider_coords = [
-        (top_left_x + 1, top_left_y),     // (1, 0)
-        (top_left_x + 2, top_left_y + 1), // (2, 1)
-        (top_left_x, top_left_y + 2),     // (0, 2)
-        (top_left_x + 1, top_left_y + 2), // (1, 2)
-        (top_left_x + 2, top_left_y + 2), // (2, 2)
-    ];
 
-    for &(x, y) in &glider_coords {
-        let cell = cell_array.mut_cell(x, y);
-        cell.spawn();
-    }
-}
-
-fn spawn_custom_pattern(cell_array: &mut CellArray<ARRAY_H, ARRAY_W>, x: isize, y: isize) {
-    let pattern_coords = [
-        (x + 2, y),
-        (x + 2, y + 1),
-        (x + 2, y + 2),
-        (x + 1, y + 2),
-        (x, y + 1),
-    ];
-
-    for &(x, y) in &pattern_coords {
-        let neighbour_count = count_neighbours(cell_array, x, y);
-        let cell = cell_array.mut_cell(x, y);
-        cell.spawn();
-    }
-}
 
 fn count_neighbours(cell_array: &CellArray<ARRAY_H, ARRAY_W>, x: isize, y: isize) -> u8 {
     let mut neighbour_count = 0;
@@ -115,54 +83,10 @@ fn solve(
     }
 }
 
-fn render_field(cell_array: &CellArray<ARRAY_H, ARRAY_W>, buffer: &mut Vec<u32>) {
-    for y in 0..ARRAY_H {
-        for x in 0..ARRAY_W {
-            let cell = cell_array.cell(x as isize, y as isize);
-            let color = if cell.alive() { 0x000000 } else { 0xFFFFFF };
-            for dy in 0..SCALE {
-                for dx in 0..SCALE {
-                    buffer[(y * SCALE + dy) * ARRAY_W * SCALE + (x * SCALE + dx)] = color;
-                }
-            }
-        }
-    }
-}
-
-fn render_field_console(cell_array: &CellArray<ARRAY_H, ARRAY_W>) {
-    // Print the top border with column indices
-    print!("   "); // Space for row indices
-    println!();
-
-    // Print the top border of the grid with column numbers
-    print!("  +");
-    for x in 0..ARRAY_W {
-        print!("-{}-+", x);
-    }
-    println!();
-
-    // Print the field with side borders and row indices
-    for y in 0..ARRAY_H {
-        print!("{:2}|", y); // Row index
-        for x in 0..ARRAY_W {
-            let cell = cell_array.cell(x as isize, y as isize);
-            let symbol = if cell.alive() { '*' } else { ' ' };
-            print!(" {} |", symbol);
-        }
-        println!(); // End of the row with a side border
-
-        // Print the horizontal border between rows without column numbers
-        print!("  +");
-        for _ in 0..ARRAY_W {
-            print!("---+");
-        }
-        println!();
-    }
-}
 
 fn main() {
     let mut cell_array = CellArray::<ARRAY_H, ARRAY_W>::new();
-    spawn_custom_pattern(&mut cell_array, 3, 3);
+    spawn_glider(&mut cell_array, 3, 3);
 
     for x in 0..cell_array.width() - 1 {
         for y in 0..cell_array.height() - 1 {
@@ -172,7 +96,7 @@ fn main() {
         }
     }
 
-    render_field_console(&cell_array);
+    cell_array.print();
     // println!("{}", cell_array);
     {
         let c1 = cell_array.cell(3, 4);
@@ -207,7 +131,7 @@ fn main() {
     for x in 0..4 {
         println!("Iteration {}", x);
         solve(&mut cell_array, &mut temp);
-        render_field_console(&cell_array);
+        cell_array.print();
         println!();
         // println!("{}", cell_array);
     }
