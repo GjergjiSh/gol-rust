@@ -67,10 +67,7 @@ fn main() {
     //Shallow copy
     let mut temp = cell_array;
 
-
     cell_array.print();
-    let cell = cell_array.cell(5, 3);
-    println!("Cell at (5,3) {}", cell.neighbour_cnt());
 
     {
         let c1 = cell_array.cell(3, 4);
@@ -103,6 +100,5 @@ fn main() {
         solve(&mut cell_array, &mut temp);
         cell_array.print();
         let cell = cell_array.cell(5, 3);
-        println!("Iteration {} - Cell at (5,3) {} {}", x + 1, cell.neighbour_cnt(), cell);
     }
 }

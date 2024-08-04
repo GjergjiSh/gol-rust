@@ -23,7 +23,7 @@ impl Cell {
     }
 
     pub fn kill(&mut self) {
-        self.0 &= 0;
+        self.0 &= !1;
     }
 
     pub fn neighbour_cnt(&self) -> u8 {
@@ -36,7 +36,7 @@ impl Cell {
 
     pub fn increment_neighbour_count(&mut self) {
         let count = (self.0 >> 1) & 0b1111;
-        assert!(count <= 8, "Neighbor count must be between 0 and 8");
+        assert!(count + 1 <= 8, "Neighbor count must be between 0 and 8");
         self.0 = (self.0 & 0b0000_0001) | ((count + 1) << 1);
     }
 
@@ -69,20 +69,23 @@ mod test_cell {
     #[test]
     fn test_spawn() {
         let mut cell = Cell::new();
+        cell.increment_neighbour_count();
+        assert_eq!(cell, 0b00000010);
         cell.spawn();
         assert_eq!(cell.alive(), true);
-        assert_eq!(cell.to_string(), "00000001");
-        assert_eq!(cell == 0b00000001, true);
+        assert_eq!(cell.to_string(), "00000011");
+        assert_eq!(cell == 0b00000011, true);
     }
 
     #[test]
     fn test_kill() {
         let mut cell = Cell::new();
         cell.spawn();
+        cell.increment_neighbour_count();
         cell.kill();
         assert_eq!(cell.alive(), false);
-        assert_eq!(cell.to_string(), "00000000");
-        assert_eq!(cell == 0b00000000, true);
+        assert_eq!(cell.to_string(), "00000010");
+        assert_eq!(cell == 0b00000010, true);
     }
 
     #[test]
@@ -92,6 +95,16 @@ mod test_cell {
         assert_eq!(cell.neighbour_cnt(), 1);
         assert_eq!(cell.to_string(), "00000010");
         assert_eq!(cell == 0b00000010, true);
+
+        cell.increment_neighbour_count();
+        assert_eq!(cell.neighbour_cnt(), 2);
+        assert_eq!(cell.to_string(), "00000100");
+        assert_eq!(cell == 0b00000100, true);
+
+        cell.increment_neighbour_count();
+        assert_eq!(cell.neighbour_cnt(), 3);
+        assert_eq!(cell.to_string(), "00000110");
+        assert_eq!(cell == 0b00000110, true);
     }
 
     #[test]

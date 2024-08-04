@@ -47,9 +47,11 @@ impl<const H: usize, const W: usize> CellArray<H, W> {
         let cell = self.mut_cell(x, y);
         cell.spawn();
 
-        for (x, y) in neighbour_coordinates.iter() {
-            let cell = self.mut_cell(*x, *y);
-            cell.increment_neighbour_count();
+        for (nx, ny) in neighbour_coordinates.iter() {
+            let neighbour_cell = self.mut_cell(*nx, *ny);
+            let old_count = neighbour_cell.neighbour_cnt();
+            neighbour_cell.increment_neighbour_count();
+            let new_count = neighbour_cell.neighbour_cnt();
         }
     }
 
@@ -59,9 +61,11 @@ impl<const H: usize, const W: usize> CellArray<H, W> {
         let cell = self.mut_cell(x, y);
         cell.kill();
 
-        for (x, y) in neighbour_coordinates.iter() {
-            let cell = self.mut_cell(*x, *y);
-            cell.decrement_neighbour_count();
+        for (nx, ny) in neighbour_coordinates.iter() {
+            let neighbour_cell = self.mut_cell(*nx, *ny);
+            let old_count = neighbour_cell.neighbour_cnt();
+            neighbour_cell.decrement_neighbour_count();
+            let new_count = neighbour_cell.neighbour_cnt();
         }
     }
 
