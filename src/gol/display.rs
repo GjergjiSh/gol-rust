@@ -14,7 +14,8 @@ pub struct Display<'a, const H: usize, const W: usize> {
 impl<'a, const H: usize, const W: usize> Display<'a, H, W> {
     pub fn new(engine: &'a mut Engine<H, W>, delay: usize) -> Self {
         //TODO: Remove this
-        engine.spawn_glider(3, 3);
+        engine.randomize();
+
         Self {
             engine: engine,
             delay: delay,
@@ -33,17 +34,19 @@ impl<'a, const H: usize, const W: usize> Display<'a, H, W> {
         });
 
         while window.is_open() && !window.is_key_down(Key::Escape) {
-            self.engine.generate(iterations);
-            let mut buffer: Vec<u32> = vec![0; W * H];
-            for y in 0..H {
-                for x in 0..W {
-                    let cell = self.engine.cells().cell(x as isize, y as isize);
-                    let color = if cell.alive() { 0xFFFFFF } else { 0x000000 }; // White for alive, black for dead
-                    buffer[y * W + x] = color;
+            for _ in 0..iterations {
+                self.engine.generate();
+                let mut buffer: Vec<u32> = vec![0; W * H];
+                for y in 0..H {
+                    for x in 0..W {
+                        let cell = self.engine.cells().cell(x as isize, y as isize);
+                        let color = if cell.alive() { 0xFFFFFF } else { 0x000000 }; // White for alive, black for dead
+                        buffer[y * W + x] = color;
+                    }
                 }
+                window.update_with_buffer(&buffer, W, H).unwrap();
+                std::thread::sleep(std::time::Duration::from_millis(self.delay as u64));
             }
-            window.update_with_buffer(&buffer, W, H).unwrap();
-            std::thread::sleep(std::time::Duration::from_millis(self.delay as u64));
         }
     }
 }

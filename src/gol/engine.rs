@@ -26,26 +26,34 @@ impl<const H: usize, const W: usize> Engine<H, W> {
         }
     }
 
-    pub fn generate(&mut self, generation_cnt: usize) {
+    pub fn randomize(&mut self) {
+        for x in 0..H {
+            for y in 0..W {
+                if rand::random() {
+                    self.cells.spawn(x as isize, y as isize);
+                }
+            }
+        }
+    }
+
+    pub fn generate(&mut self) {
         let rows = self.cells.rows();
         let cols = self.cells.cols();
 
-        for _ in 0..generation_cnt {
-            //TODO: Optimize this
-            self.cell_cache.clone_from(&self.cells);
-            for x in 0..rows {
-                for y in 0..cols {
-                    let cell = self.cell_cache.mut_cell(x as isize, y as isize);
-                    let neighbour_count = cell.neighbour_cnt();
+        //TODO: Optimize this
+        self.cell_cache.clone_from(&self.cells);
+        for x in 0..rows {
+            for y in 0..cols {
+                let cell = self.cell_cache.mut_cell(x as isize, y as isize);
+                let neighbour_count = cell.neighbour_cnt();
 
-                    if cell.alive() {
-                        if neighbour_count < 2 || neighbour_count > 3 {
-                            self.cells.kill_cell(x as isize, y as isize);
-                        }
-                    } else {
-                        if neighbour_count == 3 {
-                            self.cells.spawn(x as isize, y as isize);
-                        }
+                if cell.alive() {
+                    if neighbour_count < 2 || neighbour_count > 3 {
+                        self.cells.kill_cell(x as isize, y as isize);
+                    }
+                } else {
+                    if neighbour_count == 3 {
+                        self.cells.spawn(x as isize, y as isize);
                     }
                 }
             }
