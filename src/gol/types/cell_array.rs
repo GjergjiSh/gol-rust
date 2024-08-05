@@ -1,6 +1,6 @@
 use std::{fmt, ptr};
 
-use crate::gol::cell::Cell;
+use crate::gol::types::Cell;
 
 // Stack allocated 2D array of Cells
 #[derive(Debug, Copy, Clone)]
@@ -33,15 +33,15 @@ impl<const H: usize, const W: usize> CellArray<H, W> {
         self.0.iter_mut().flat_map(|row| row.iter_mut())
     }
 
-    pub fn width(&self) -> usize {
+    pub fn rows(&self) -> usize {
         H
     }
 
-    pub fn height(&self) -> usize {
+    pub fn cols(&self) -> usize {
         W
     }
 
-    pub fn spawn_cell(&mut self, x: isize, y: isize) {
+    pub fn spawn(&mut self, x: isize, y: isize) {
         let neighbour_coordinates = self.neighbour_coordinates(x, y);
 
         let cell = self.mut_cell(x, y);
@@ -291,7 +291,7 @@ mod test_cell_array {
         ];
 
         for &(x, y) in &pattern_coords {
-            cell_array.spawn_cell(x, y);
+            cell_array.spawn(x, y);
         }
 
         //First column

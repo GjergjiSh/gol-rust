@@ -1,7 +1,5 @@
 use std::{fmt, ptr};
 
-use crate::gol::cell_array::CellArray;
-
 // Wrapper around a u8.
 // Represents the state of a cell.
 // Offers simple API for manipulating the state via bitwise operations.

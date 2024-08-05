@@ -1,4 +1,4 @@
-use crate::gol::CellArray;
+use crate::gol::types::CellArray;
 
 pub fn spawn_glider<const H: usize, const W: usize>(cell_array: &mut CellArray<H, W>, x: isize, y: isize) {
     let pattern_coords = [
@@ -10,6 +10,6 @@ pub fn spawn_glider<const H: usize, const W: usize>(cell_array: &mut CellArray<H
     ];
 
     for &(x, y) in &pattern_coords {
-        cell_array.spawn_cell(x, y)
+        cell_array.spawn(x, y)
     }
 }

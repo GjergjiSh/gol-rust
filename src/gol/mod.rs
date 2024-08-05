@@ -1,7 +1,9 @@
-pub mod cell;
-pub mod cell_array;
-pub mod utils;
+pub mod types;
+pub mod patterns;
+pub mod engine;
+pub mod display;
 
-pub use cell_array::CellArray;
-pub use cell::Cell;
-pub use utils::*;
+pub use types::*;
+pub use patterns::*;
+pub use engine::*;
+pub use display::*;
