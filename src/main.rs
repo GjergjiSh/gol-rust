@@ -3,19 +3,24 @@
 
 mod gol;
 use gol::*;
+use std::{cell::RefCell, rc::Rc};
 
 const H: usize = 100;
 const W: usize = 100;
 const GENERATIONS: usize = 100;
-const SCALE: usize = 100;
-const VERBOSE: bool = false;
-const DELAY: usize = 100;
-
-//TODO: set_fps
-//TODO: add shadow buffer around the edges and use that to calculate the next generation or rethink the wrapping
+const SCALE: usize = 1;
+const DELAY: usize = 20;
 
 fn main() {
-    let mut engine = Engine::<H, W>::new();
-    let mut display = Display::<H, W>::new(&mut engine, DELAY);
-    display.run(GENERATIONS);
+    let engine = Engine::<H, W>::new();
+    let engine = RefCell::new(engine);
+    engine.borrow_mut().randomize();
+
+    let mut display = Display::<H, W>::new(EngineRef::new(&engine), DELAY);
+
+    for _ in 0..GENERATIONS {
+        engine.borrow_mut().generate();
+        display.update();
+    }
+
 }
