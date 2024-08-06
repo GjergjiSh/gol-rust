@@ -1,4 +1,4 @@
-use std::{fmt, ptr};
+use std::fmt;
 
 use crate::gol::types::Cell;
 
@@ -25,18 +25,6 @@ impl<const H: usize, const W: usize> CellArray<H, W> {
         &mut self.0[wrapped_y][wrapped_x]
     }
 
-    pub fn cells(&self) -> &[[Cell; W]; H] {
-        &self.0
-    }
-
-    pub fn iter(&self) -> impl Iterator<Item = &Cell> {
-        self.0.iter().flat_map(|row| row.iter())
-    }
-
-    pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut Cell> {
-        self.0.iter_mut().flat_map(|row| row.iter_mut())
-    }
-
     pub fn rows(&self) -> usize {
         H
     }
@@ -53,9 +41,7 @@ impl<const H: usize, const W: usize> CellArray<H, W> {
 
         for (nx, ny) in neighbour_coordinates.iter() {
             let neighbour_cell = self.mut_cell(*nx, *ny);
-            let old_count = neighbour_cell.neighbours();
             neighbour_cell.add_neighbour();
-            let new_count = neighbour_cell.neighbours();
         }
     }
 
@@ -67,9 +53,7 @@ impl<const H: usize, const W: usize> CellArray<H, W> {
 
         for (nx, ny) in neighbour_coordinates.iter() {
             let neighbour_cell = self.mut_cell(*nx, *ny);
-            let old_count = neighbour_cell.neighbours();
             neighbour_cell.remove_neighbour();
-            let new_count = neighbour_cell.neighbours();
         }
     }
 
@@ -86,13 +70,7 @@ impl<const H: usize, const W: usize> CellArray<H, W> {
         ]
     }
 
-    //TODO: This can be parallelized?
-    pub fn memcopy(&mut self, other: &mut Self) {
-        unsafe {
-            ptr::copy_nonoverlapping(self.0.as_ptr(), other.0.as_mut_ptr(), H * W);
-        }
-    }
-
+    #[allow(dead_code)]
     pub fn print(&self) {
         // Print the top border with column indices
         print!("   "); // Space for row indices

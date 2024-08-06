@@ -1,4 +1,4 @@
-use std::{fmt, ptr};
+use std::fmt;
 
 // Wrapper around a u8.
 // Represents the state of a cell.
@@ -50,7 +50,7 @@ impl Cell {
         //     return;
         // }
         // TODO: This part of the code does not behave as intended.
-        assert!(count >= 0, "Neighbor count must be between 0 and 8");
+        // assert!(count >= 0, "Neighbor count must be between 0 and 8");
         self.0 = (self.0 & 0b0000_0001) | ((count - 1) << 1);
     }
 }

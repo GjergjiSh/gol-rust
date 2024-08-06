@@ -1,5 +1,3 @@
-use std::{cell::RefCell, rc::Rc};
-
 use crate::gol::types::*;
 pub struct Engine<const H: usize, const W: usize> {
     cells: CellArray<H, W>,
@@ -14,19 +12,6 @@ impl<const H: usize, const W: usize> Engine<H, W> {
         }
     }
 
-    pub fn spawn_glider(&mut self, x: isize, y: isize) {
-        let pattern_coords = [
-            (x + 2, y),
-            (x + 2, y + 1),
-            (x + 2, y + 2),
-            (x + 1, y + 2),
-            (x, y + 1),
-        ];
-
-        for &(x, y) in &pattern_coords {
-            self.cells.spawn(x, y)
-        }
-    }
 
     pub fn randomize(&mut self) {
         for x in 0..H {
@@ -69,42 +54,9 @@ impl<const H: usize, const W: usize> Engine<H, W> {
         &self.cells
     }
 
-    pub fn cell(&self, x: isize, y: isize) -> &Cell {
-        self.cells.cell(x, y)
-    }
-
-    pub fn print(&self) {
-        // Print the top border of the grid with column numbers
-        print!("  +");
-        for x in 0..W {
-            print!("-{}-+", x); // Col index
-        }
-        println!();
-
-        // Print the field with side borders and row indices
-        for y in 0..H {
-            print!("{:2}|", y); // Row index
-            for x in 0..W {
-                let cell = self.cells.cell(x as isize, y as isize);
-                let symbol = if cell.alive() { '*' } else { ' ' };
-                print!(" {} |", symbol);
-            }
-            println!(); // End of the row with a side border
-
-            // Print the horizontal border between rows without column numbers
-            print!("  +");
-            for _ in 0..H {
-                print!("---+");
-            }
-            println!();
-        }
-
-        println!();
-    }
 }
 
-// Immutable reference to the Engine
-pub struct EngineRef<'a, const H: usize, const W: usize> {
+/* pub struct EngineRef<'a, const H: usize, const W: usize> {
     engine: &'a RefCell<Engine<H, W>>,
 }
 
@@ -120,9 +72,9 @@ impl<'a, const H: usize, const W: usize> EngineRef<'a, H, W> {
     pub fn borrow_mut(&self) -> std::cell::RefMut<'_, Engine<H, W>> {
         self.engine.borrow_mut()
     }
-}
+} */
 
-pub struct ImmutableEngineRef<'a, const H: usize, const W: usize> {
+/* pub struct ImmutableEngineRef<'a, const H: usize, const W: usize> {
     engine: &'a RefCell<Engine<H, W>>,
 }
 
@@ -134,7 +86,7 @@ impl<'a, const H: usize, const W: usize> ImmutableEngineRef<'a, H, W> {
     pub fn borrow(&self) -> std::cell::Ref<'_, Engine<H, W>> {
         self.engine.borrow()
     }
-}
+} */
 
 #[cfg(test)]
 mod tests {
@@ -159,13 +111,6 @@ mod tests {
 
         let average_time = total_time / count as u32;
         (average_time, total_time)
-    }
-
-    fn copy<const H: usize, const W: usize>(src: &CellArray<H, W>, dst: &mut CellArray<H, W>) {
-        let src_cells = src.cells();
-        let dst_cells = dst.cells();
-
-        // dest_cells.copy_from_slice(src_cells);
     }
 
     #[test]

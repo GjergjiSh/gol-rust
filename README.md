@@ -6,3 +6,5 @@ TODO: Copy/Clone vs memcopy
 // use that to calculate the next generation
 // or rethink the wrapping
 //TODO: Builder pattern
+//TODO: Display CFG
+//TODO: Quit on ESC
