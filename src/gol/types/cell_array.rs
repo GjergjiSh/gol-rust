@@ -413,22 +413,4 @@ mod test_cell_array {
         assert_eq!(c25.alive(), false);
         assert_eq!(c25_neighbours, 0);
     }
-
-    /* #[test]
-    fn test_memcopy() {
-        let mut cell_array = setup();
-        let mut other = setup();
-
-        let cell = cell_array.mut_cell(0, 0);
-        cell.spawn();
-        cell.set_neighbors(8);
-
-        cell_array.memcopy(&mut other);
-
-        let cell = other.cell(0, 0);
-        assert_eq!(cell.neighbour_cnt();, 8);
-        assert_eq!(cell.is_alive(), true);
-        assert_eq!(cell.to_string(), "00010001");
-        assert_eq!(*cell == 0b00010001, true);
-    } */
 }

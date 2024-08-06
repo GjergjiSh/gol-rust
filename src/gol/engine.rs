@@ -12,7 +12,6 @@ impl<const H: usize, const W: usize> Engine<H, W> {
         }
     }
 
-
     pub fn randomize(&mut self) {
         for x in 0..H {
             for y in 0..W {
@@ -55,38 +54,6 @@ impl<const H: usize, const W: usize> Engine<H, W> {
     }
 
 }
-
-/* pub struct EngineRef<'a, const H: usize, const W: usize> {
-    engine: &'a RefCell<Engine<H, W>>,
-}
-
-impl<'a, const H: usize, const W: usize> EngineRef<'a, H, W> {
-    pub fn new(engine: &'a RefCell<Engine<H, W>>) -> Self {
-        Self { engine }
-    }
-
-    pub fn borrow(&self) -> std::cell::Ref<'_, Engine<H, W>> {
-        self.engine.borrow()
-    }
-
-    pub fn borrow_mut(&self) -> std::cell::RefMut<'_, Engine<H, W>> {
-        self.engine.borrow_mut()
-    }
-} */
-
-/* pub struct ImmutableEngineRef<'a, const H: usize, const W: usize> {
-    engine: &'a RefCell<Engine<H, W>>,
-}
-
-impl<'a, const H: usize, const W: usize> ImmutableEngineRef<'a, H, W> {
-    pub fn new(engine: &'a RefCell<Engine<H, W>>) -> Self {
-        Self { engine }
-    }
-
-    pub fn borrow(&self) -> std::cell::Ref<'_, Engine<H, W>> {
-        self.engine.borrow()
-    }
-} */
 
 #[cfg(test)]
 mod tests {
@@ -131,21 +98,6 @@ mod tests {
             "Total time taken to clone {} bytes {} times: {:?}",
             size, COUNT, total_time
         );
-    }
-
-    #[test]
-    fn test_memcopy_time() {
-        // const H: usize = 100;
-        // const W: usize = 100;
-        // const COUNT: usize = 1000;
-        // let mut engine = Engine::<H, W>::new();
-        // let (average_time, total_time) = measure_execution_time(
-        //     || engine.cell_cache.memcopy_from(&engine.cells),
-        //     COUNT,
-        // );
-
-        // println!("Average time taken to memcopy: {:?}", average_time);
-        // println!("Total time taken to memcopy: {:?}", total_time);
     }
 
     #[test]
