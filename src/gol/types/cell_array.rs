@@ -3,12 +3,13 @@ use std::fmt;
 use crate::gol::types::Cell;
 
 // Stack allocated 2D array of Cells
-#[derive(Debug, Copy, Clone)]
-pub struct CellArray<const H: usize, const W: usize>([[Cell; W]; H]);
+#[derive(Debug, Clone)]
+pub struct CellArray<const H: usize, const W: usize>(Box<[[Cell; W]; H]>);
 
 impl<const H: usize, const W: usize> CellArray<H, W> {
     pub fn new() -> CellArray<H, W> {
-        CellArray([[Cell::new(); W]; H])
+        use core::array::from_fn;
+        CellArray(Box::new(from_fn(|_| from_fn(|_| Cell::new()))))
     }
 
     // Return a reference to the cell at (x, y)

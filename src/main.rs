@@ -2,8 +2,8 @@ mod gol;
 use gol::*;
 use std::cell::RefCell;
 
-const H: usize = 100;
-const W: usize = 100;
+const H: usize = 1000;
+const W: usize = 1000;
 const GENERATIONS: usize = 1000;
 const DELAY: usize = 20;
 

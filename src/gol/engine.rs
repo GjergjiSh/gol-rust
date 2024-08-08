@@ -1,14 +1,14 @@
 use crate::gol::types::*;
 pub struct Engine<const H: usize, const W: usize> {
-    cells: CellArray<H, W>,
-    cell_cache: CellArray<H, W>,
+    cells: Box<CellArray<H, W>>,
+    cell_cache: Box<CellArray<H, W>>,
 }
 
 impl<const H: usize, const W: usize> Engine<H, W> {
     pub fn new() -> Self {
         Self {
-            cells: CellArray::new(),
-            cell_cache: CellArray::new(),
+            cells: Box::new(CellArray::new()),
+            cell_cache: Box::new(CellArray::new()),
         }
     }
 
@@ -52,7 +52,6 @@ impl<const H: usize, const W: usize> Engine<H, W> {
     pub fn cells(&self) -> &CellArray<H, W> {
         &self.cells
     }
-
 }
 
 #[cfg(test)]
@@ -102,22 +101,13 @@ mod tests {
 
     #[test]
     fn test_generate_time() {
-        let stack_size = 100 * 1024 * 1024; // 100 MB
+        const H: usize = 1000;
+        const W: usize = 1000;
+        let mut engine = Engine::<H, W>::new();
 
-        let handler = thread::Builder::new()
-            .stack_size(stack_size)
-            .spawn(|| {
-                const H: usize = 1000;
-                const W: usize = 1000;
-                let mut engine = Engine::<H, W>::new();
-
-                let start = std::time::Instant::now();
-                engine.generate();
-                let end = std::time::Instant::now();
-                println!("Time taken to generate: {:?}", end.duration_since(start));
-            })
-            .unwrap();
-
-        handler.join().unwrap();
+        let start = std::time::Instant::now();
+        engine.generate();
+        let end = std::time::Instant::now();
+        println!("Time taken to generate: {:?}", end.duration_since(start));
     }
 }

@@ -8,62 +8,62 @@ use std::fmt;
 // The last 3 bits are unused
 //  [x, x, x, |0, 0, 0, 0, |1] -> Alive cell with 0 neighbors
 //  [x, x, x, |1, 0, 0, 0, |0] -> Dead cell with 8 neighbors
-#[derive(Debug, Copy, Clone)]
-pub struct Cell(u8);
+#[derive(Debug, Clone)]
+pub struct Cell(Box<u8>);
 
 impl Cell {
     pub fn new() -> Cell {
-        Cell(0)
+        Cell(Box::new(0))
     }
 
     // Bitwise operation to set the first bit to 1
     pub fn spawn(&mut self) {
-        self.0 |= 1;
+        *self.0 |= 1;
     }
 
     // Bitwise operation to set the first bit to 0
     pub fn kill(&mut self) {
-        self.0 &= !1;
+        *self.0 &= !1;
     }
 
     // Bitwise operation to check if the first bit is 1
     pub fn alive(&self) -> bool {
-        self.0 & 1 == 1
+        *self.0 & 1 == 1
     }
 
     // Bitwise operation to get the number of neighbors
     pub fn neighbours(&self) -> u8 {
-        (self.0 >> 1) & 0b0000_1111
+        (*self.0 >> 1) & 0b0000_1111
     }
 
     // Bitwise operation to increment the number of neighbors
     pub fn add_neighbour(&mut self) {
-        let count = (self.0 >> 1) & 0b1111;
+        let count = (*self.0 >> 1) & 0b1111;
         assert!(count + 1 <= 8, "Neighbor count must be between 0 and 8");
-        self.0 = (self.0 & 0b0000_0001) | ((count + 1) << 1);
+        *self.0 = (*self.0 & 0b0000_0001) | ((count + 1) << 1);
     }
 
     // Bitwise operation to decrement the number of neighbors
     pub fn remove_neighbour(&mut self) {
-        let count = (self.0 >> 1) & 0b1111;
+        let count = (*self.0 >> 1) & 0b1111;
         // if count == 0 {
         //     return;
         // }
         // TODO: This part of the code does not behave as intended.
         // assert!(count >= 0, "Neighbor count must be between 0 and 8");
-        self.0 = (self.0 & 0b0000_0001) | ((count - 1) << 1);
+        *self.0 = (*self.0 & 0b0000_0001) | ((count - 1) << 1);
     }
 }
 
 impl PartialEq<u8> for Cell {
     fn eq(&self, other: &u8) -> bool {
-        &self.0 == other
+        *self.0 == *other
     }
 }
 
 impl fmt::Display for Cell {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{:08b}", self.0)
+        write!(f, "{:08b}", *self.0)
     }
 }
 
