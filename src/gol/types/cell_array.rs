@@ -1,28 +1,43 @@
-use std::fmt;
+use std::{alloc::{alloc, Layout}, fmt};
 
 use crate::gol::types::Cell;
 
 // Stack allocated 2D array of Cells
-#[derive(Debug, Copy, Clone)]
-pub struct CellArray<const H: usize, const W: usize>([[Cell; W]; H]);
+#[derive(Debug, Clone)]
+pub struct CellArray<const H: usize, const W: usize>(Box<[Cell]>);
 
 impl<const H: usize, const W: usize> CellArray<H, W> {
     pub fn new() -> CellArray<H, W> {
-        CellArray([[Cell::new(); W]; H])
+        let layout = Layout::array::<Cell>(H * W).unwrap();
+
+        let ptr = unsafe { alloc(layout) as *mut Cell };
+
+        if ptr.is_null() {
+            panic!("Memory allocation failed");
+        }
+
+        unsafe {
+            std::ptr::write_bytes(ptr, 0b00000000, H * W);
+        }
+
+        let slice = unsafe { std::slice::from_raw_parts_mut(ptr, H * W) };
+        let data = unsafe { Box::from_raw(slice as *mut [Cell]) };
+
+        CellArray(data)
     }
 
     // Return a reference to the cell at (x, y)
     pub fn cell(&self, x: isize, y: isize) -> &Cell {
         let wrapped_x = ((x % W as isize + W as isize) % W as isize) as usize;
         let wrapped_y = ((y % H as isize + H as isize) % H as isize) as usize;
-        &self.0[wrapped_y][wrapped_x]
+        &self.0[wrapped_y * W + wrapped_x]
     }
 
     // Return a mutable reference to the cell at (x, y)
     pub fn mut_cell(&mut self, x: isize, y: isize) -> &mut Cell {
         let wrapped_x = ((x % W as isize + W as isize) % W as isize) as usize;
         let wrapped_y = ((y % H as isize + H as isize) % H as isize) as usize;
-        &mut self.0[wrapped_y][wrapped_x]
+        &mut self.0[wrapped_y * W + wrapped_x]
     }
 
     pub fn rows(&self) -> usize {
@@ -109,7 +124,7 @@ impl<const H: usize, const W: usize> fmt::Display for CellArray<H, W> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for i in 0..H {
             for j in 0..W {
-                write!(f, "{} ", self.0[i][j])?;
+                write!(f, "{} ", self.0[i * W + j])?;
             }
             writeln!(f)?;
         }
@@ -129,10 +144,33 @@ mod test_cell_array {
     }
 
     #[test]
+    fn test_create() {
+        let mut cell_array = setup();
+        for x in 0..cell_array.rows() {
+            for y in 0..cell_array.cols() {
+                let cell = cell_array.mut_cell(x as isize, y as isize);
+                assert_eq!(cell.alive() , false);
+                assert_eq!(cell.neighbours(), 0);
+                assert_eq!(cell.to_string(), "00000000");
+                assert_eq!(*cell , 0b00000000);
+
+                cell.spawn();
+                for _ in 0..8 {
+                    cell.add_neighbour();
+                }
+
+                assert_eq!(cell.alive() , true);
+                assert_eq!(cell.neighbours() , 8);
+                assert_eq!(cell.to_string(), "00010001");
+                assert_eq!(*cell == 0b00010001, true);
+            }
+        }
+    }
+
+    #[test]
     fn test_wrapping_top_left_to_top_right() {
         let mut cell_array = setup();
 
-        // Should wrap to (ARRAY_W - 1, 0)
         let x = -1;
         let cell = cell_array.mut_cell(x, 0);
         cell.spawn();
@@ -145,7 +183,6 @@ mod test_cell_array {
     fn test_wrapping_top_right_to_top_left() {
         let mut cell_array = setup();
 
-        // Should wrap to (0, 0)
         let x = ARRAY_W as isize;
         let cell = cell_array.mut_cell(x, 0);
         cell.spawn();
@@ -176,7 +213,7 @@ mod test_cell_array {
         let cell = cell_array.mut_cell(x, y);
         cell.spawn();
 
-        let destination = cell_array.cell(0, (ARRAY_H - 1) as isize); // Bottom-left cell
+        let destination = cell_array.cell(0, (ARRAY_H - 1) as isize);
         assert_eq!(destination.alive(), true);
     }
 
@@ -276,6 +313,8 @@ mod test_cell_array {
             cell_array.spawn(x, y);
         }
 
+        cell_array.print();
+
         //First column
         let c1 = cell_array.mut_cell(0, 0);
         let c1_neighbours = c1.neighbours();
@@ -296,6 +335,7 @@ mod test_cell_array {
         let c3 = cell_array.cell(0, 2);
         let c3_neighbours = c3.neighbours();
         assert_eq!(c3.alive(), false);
+        cell_array.print();
         assert_eq!(c3_neighbours, 2);
 
         let c4 = cell_array.cell(0, 3);

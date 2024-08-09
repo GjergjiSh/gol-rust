@@ -12,6 +12,7 @@ use std::fmt;
 pub struct Cell(u8);
 
 impl Cell {
+    #[allow(dead_code)]
     pub fn new() -> Cell {
         Cell(0)
     }
@@ -46,11 +47,6 @@ impl Cell {
     // Bitwise operation to decrement the number of neighbors
     pub fn remove_neighbour(&mut self) {
         let count = (self.0 >> 1) & 0b1111;
-        // if count == 0 {
-        //     return;
-        // }
-        // TODO: This part of the code does not behave as intended.
-        // assert!(count >= 0, "Neighbor count must be between 0 and 8");
         self.0 = (self.0 & 0b0000_0001) | ((count - 1) << 1);
     }
 }

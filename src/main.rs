@@ -5,7 +5,7 @@ use std::cell::RefCell;
 const H: usize = 100;
 const W: usize = 100;
 const GENERATIONS: usize = 1000;
-const DELAY: usize = 20;
+const DELAY: usize = 0;
 
 fn main() {
     let engine = RefCell::new(Engine::<H, W>::new());
